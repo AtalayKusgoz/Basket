@@ -1,0 +1,22 @@
+version: "3.8"
+services: 
+  postgredb:
+    image: postgres
+  mongodb:
+    image: mongo
+  redisdb:
+    image: redis
+  discount.api:
+    image: discount_api_image
+    build: 
+      context: .
+      dockerfile: Services/Discount/DefineX.Services.Discount.Api/Dockerfile
+  gateway.api:
+    image: gateway_api_image
+    build: 
+      context: .
+      dockerfile: Gateways/DefineX.Gateway/Dockerfile
+volumes: 
+  postgredb_volume:
+  mongodb_volume:
+  

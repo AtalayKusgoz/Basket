@@ -1,0 +1,47 @@
+version: "3.8"
+services: 
+  postgredb:
+    container_name: postgredb
+    restart: always
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgredb_volume:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=guest
+      - POSTGRES_PASSWORD=guest
+      - POSTGRES_DB=dfxdb
+  mongodb:
+    container_name: mongodb
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongodb_volume:/data/db
+  redisdb:
+    container_name: redisdb
+    restart: always
+    ports:
+      - "6379:6379"
+  discount.api:
+    container_name: discount.api
+    restart: on-failure
+    environment: 
+      - ASPNETCORE_ENVIRONMENT=Development
+      - "DefineXConfig:DbCon=User Id=guest; Password=guest; Server=postgredb; Port=5432;Database=dfxdb;Integrated Security=true;Pooling=true"
+      - "DefineXConfig:MongoConnectionString=mongodb://mongodb:27017"
+      - "DefineXConfig:RedisSettings:Host=redisdb"
+      - "DefineXConfig:RedisSettings:Port=6379"
+    ports: 
+      - "5035:80"
+    depends_on: 
+      - postgredb
+      - mongodb
+      - redisdb
+  gateway.api:
+    container_name: gateway.api
+    restart: always
+    environment: 
+      - ASPNETCORE_ENVIRONMENT=Production
+    ports: 
+      - "5001:80"
